@@ -33,15 +33,13 @@ const users = [
     id: "user1",
     firstName: "Cat",
     lastName: "Girl",
-    avatar:
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2643&q=80",
+    avatar: "/cat-sq.jpg",
   },
   {
     id: "user2",
     firstName: "Dog",
     lastName: "Boy",
-    avatar:
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2148&q=80",
+    avatar: "/dog-sq.jpg",
   },
 ];
 
@@ -51,6 +49,7 @@ export function Chat({ supabase }: { supabase: any }) {
   const [chatId, setChatId] = useState<string>(
     "4113f429-c4ad-42aa-b43f-0a2bcafaeaa5"
   );
+
   const userContext = useUser();
 
   const user = userContext ? userContext.user : null;
@@ -78,13 +77,13 @@ export function Chat({ supabase }: { supabase: any }) {
   const [activeUser, setActiveUser] = useState(users[0]);
 
   const getData = async () => {
-    const { data, error } = await supabase
-      .from("chat_messages")
-      .select()
-      .eq("chat_id", chatId);
-    if (data) {
-      setData(data);
-    }
+    // const { data, error } = await supabase
+    //   .from("chat_messages")
+    //   .select()
+    //   .eq("chat_id", chatId);
+    // if (data) {
+    //   setData(data);
+    // }
 
     return data;
   };
@@ -173,7 +172,7 @@ export function Chat({ supabase }: { supabase: any }) {
           <div
             key={index}
             className={`w-full mb-2 flex items-start ${
-              userId === item.sender_id ? "justify-end" : "justify-start"
+              activeUser.id === item.sender_id ? "justify-end" : "justify-start"
             }`}
             onMouseEnter={() => setHoveredMessageId(item.id)}
             onMouseLeave={() => setHoveredMessageId(null)}
@@ -182,7 +181,7 @@ export function Chat({ supabase }: { supabase: any }) {
               style={{ maxWidth: "75%" }}
               className="flex gap-1 items-end relative"
             >
-              {userId !== item.sender_id && (
+              {activeUser.id !== item.sender_id && (
                 <div className="w-6 h-6 bg-cover bg-center rounded-full overflow-hidden flex-shrink-0">
                   <img src={avatars[item.sender_id] || ""} />
                 </div>
@@ -199,12 +198,12 @@ export function Chat({ supabase }: { supabase: any }) {
                 </div>
                 <div
                   className={`${
-                    userId === item.sender_id
+                    activeUser.id === item.sender_id
                       ? "bg-gray-600 text-white"
                       : "bg-gray-300 text-black"
                   } rounded-2xl px-3 py-2 break-words text-sm`}
                 >
-                  {userId === item.sender_id &&
+                  {activeUser.id === item.sender_id &&
                     hoveredMessageId === item.id && (
                       <Alert
                         action={handleDeleteMessage}
@@ -232,7 +231,7 @@ export function Chat({ supabase }: { supabase: any }) {
         </span>
       </CardHeader>
       <CardContent>
-        {user && (
+        {true && (
           <>
             <form onSubmit={handleSendMessage}>
               <div className="flex flex-col gap-2">
@@ -259,8 +258,13 @@ export function Chat({ supabase }: { supabase: any }) {
         )}
       </CardContent>
       <CardFooter className="flex justify-between">
-        <button onClick={toggleUser}>Switch User</button>
-        <span>Active User: {activeUser.firstName}</span>
+        <Button onClick={toggleUser}>Switch User</Button>
+        <span>
+          Active User:{" "}
+          <span className="bg-gray-200 rounded-xl py-1 px-2">
+            {activeUser.firstName}
+          </span>
+        </span>
       </CardFooter>
     </Card>
   );

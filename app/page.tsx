@@ -32,14 +32,14 @@ export default function Home() {
           <h1 className="text-center w-full font-extrabold leading-tight tracking-tight text-5xl sm:text-4xl md:text-5xl">
             Chat App
           </h1>
-          <div className="w-[150px] items-center flex">
+          {/* <div className="w-[150px] items-center flex">
             <button
               className="rounded bg-gray-200 px-2 mt-2 hover:bg-gray-100 cursor-pointer border "
               onClick={handleSupabaseAuth}
             >
               {userContext?.user ? "Sign Out" : "Sign In"}
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="sm:w-[500px]">
