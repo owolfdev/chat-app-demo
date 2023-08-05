@@ -1,9 +1,6 @@
-"use client";
-
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Alert } from "@/components/alert";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-
 import { useUser } from "@/lib/UserContext";
 
 type ChatMessage = {
@@ -43,15 +39,12 @@ const users = [
   },
 ];
 
-export function Chat({ supabase }: { supabase: any }) {
+export function Chat() {
   const [avatars, setAvatars] = useState<Record<string, string>>({});
   const [newMessage, setNewMessage] = useState<string>("");
-  const [chatId, setChatId] = useState<string>(
-    "4113f429-c4ad-42aa-b43f-0a2bcafaeaa5"
-  );
+  const [chatId] = useState<string>("4113f429-c4ad-42aa-b43f-0a2bcafaeaa5");
 
   const userContext = useUser();
-
   const user = userContext ? userContext.user : null;
 
   const localStorageKey = "demoChatMessages";
@@ -65,27 +58,15 @@ export function Chat({ supabase }: { supabase: any }) {
     return saved ? JSON.parse(saved) : [];
   };
 
-  const toggleUser = () => {
-    setActiveUser((prevUser) =>
-      prevUser.id === "user1" ? users[1] : users[0]
-    );
-  };
-
   const [data, setData] = useState<ChatMessage[]>(
     getMessagesFromLocalStorage()
   );
   const [activeUser, setActiveUser] = useState(users[0]);
 
-  const getData = async () => {
-    // const { data, error } = await supabase
-    //   .from("chat_messages")
-    //   .select()
-    //   .eq("chat_id", chatId);
-    // if (data) {
-    //   setData(data);
-    // }
-
-    return data;
+  const toggleUser = () => {
+    setActiveUser((prevUser) =>
+      prevUser.id === "user1" ? users[1] : users[0]
+    );
   };
 
   useEffect(() => {
@@ -95,13 +76,7 @@ export function Chat({ supabase }: { supabase: any }) {
     });
   }, []);
 
-  useEffect(() => {}, [newMessage]);
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const handleSendMessage = (e: any) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
 
     const newChatMessage: ChatMessage = {
@@ -119,32 +94,20 @@ export function Chat({ supabase }: { supabase: any }) {
     setNewMessage("");
   };
 
-  useEffect(() => {
-    if (data) {
-      setData(data);
-    }
+  const handleDeleteMessage = async (id: string) => {
+    const updatedMessages = data.filter((message) => message.id !== id);
+    setData(updatedMessages);
+    saveMessagesToLocalStorage(updatedMessages);
+  };
 
-    const channel = supabase
-      .channel("schema-db-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-        },
-        (payload: any) => setData((messages) => [...messages, payload.new])
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [data]);
-
-  const ChatView = ({ data }: { data: ChatMessage[] }) => {
-    const userContext = useUser();
-    const userId = userContext ? userContext.user?.id : null;
+  const ChatView = ({
+    data,
+    onDeleteMessage,
+  }: {
+    data: ChatMessage[];
+    onDeleteMessage: (id: string) => void;
+  }) => {
+    const userId = user ? user.id : null;
     const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(
       null
     );
@@ -152,19 +115,6 @@ export function Chat({ supabase }: { supabase: any }) {
     const sortedData = [...data].sort(
       (a, b) => new Date(b.sent_at).getTime() - new Date(a.sent_at).getTime()
     );
-
-    const handleDeleteMessage = async (id: string) => {
-      const { data, error } = await supabase
-        .from("chat_messages")
-        .delete()
-        .eq("id", id);
-
-      if (error) {
-        console.error("Error deleting message", error);
-      } else {
-        getData();
-      }
-    };
 
     return (
       <div className="w-full border rounded-lg h-[400px] overflow-y-scroll p-4 flex flex-col">
@@ -183,7 +133,7 @@ export function Chat({ supabase }: { supabase: any }) {
             >
               {activeUser.id !== item.sender_id && (
                 <div className="w-6 h-6 bg-cover bg-center rounded-full overflow-hidden flex-shrink-0">
-                  <img src={avatars[item.sender_id] || ""} />
+                  <img src={avatars[item.sender_id] || ""} alt="User Avatar" />
                 </div>
               )}
               <div>
@@ -223,7 +173,7 @@ export function Chat({ supabase }: { supabase: any }) {
   };
 
   return (
-    <Card className="w-full mx-auto ">
+    <Card className="w-full mx-auto">
       <CardHeader>
         <CardTitle>Welcome</CardTitle>
         <span className="font-base text-md">
@@ -231,31 +181,27 @@ export function Chat({ supabase }: { supabase: any }) {
         </span>
       </CardHeader>
       <CardContent>
-        {true && (
-          <>
-            <form onSubmit={handleSendMessage}>
-              <div className="flex flex-col gap-2">
-                <Input
-                  value={newMessage}
-                  className="w-full sm:w-auto"
-                  placeholder="Enter your message"
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <div>
-                  <Button
-                    className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2"
-                    type="submit"
-                  >
-                    Send
-                  </Button>
-                </div>
-              </div>
-            </form>
-            <div className="mt-6">
-              <ChatView data={data} />
+        <form onSubmit={handleSendMessage}>
+          <div className="flex flex-col gap-2">
+            <Input
+              value={newMessage}
+              className="w-full sm:w-auto"
+              placeholder="Enter your message"
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <div>
+              <Button
+                className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2"
+                type="submit"
+              >
+                Send
+              </Button>
             </div>
-          </>
-        )}
+          </div>
+        </form>
+        <div className="mt-6">
+          <ChatView data={data} onDeleteMessage={handleDeleteMessage} />
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button onClick={toggleUser}>Switch User</Button>
