@@ -185,9 +185,7 @@ export function Chat() {
     <Card className="w-full mx-auto">
       <CardHeader>
         <CardTitle>Welcome</CardTitle>
-        <span className="font-base text-md">
-          {activeUser.firstName} {activeUser.lastName}
-        </span>
+        <span className="font-base text-md">{activeUser.firstName}</span>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSendMessage}>
@@ -215,7 +213,7 @@ export function Chat() {
       <CardFooter className="flex justify-between">
         <Button onClick={toggleUser}>Switch User</Button>
         <span>
-          Active User:{" "}
+          <span className="text-sm">Active User: </span>
           <span className="bg-gray-200 rounded-xl py-1 px-2">
             {activeUser.firstName}
           </span>

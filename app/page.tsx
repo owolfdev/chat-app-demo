@@ -17,7 +17,7 @@ export default function Home() {
           </h1>
         </div>
       </div>
-      <div className="sm:w-[500px]">
+      <div className="w-[350px] sm:w-[500px]">
         <Chat />
       </div>
     </section>
