@@ -58,9 +58,7 @@ export function Chat() {
     return saved ? JSON.parse(saved) : [];
   };
 
-  const [data, setData] = useState<ChatMessage[]>(
-    getMessagesFromLocalStorage()
-  );
+  const [data, setData] = useState<ChatMessage[]>([]);
   const [activeUser, setActiveUser] = useState(users[0]);
 
   const toggleUser = () => {
@@ -68,6 +66,17 @@ export function Chat() {
       prevUser.id === "user1" ? users[1] : users[0]
     );
   };
+
+  useEffect(() => {
+    // Move the function inside useEffect
+    const getMessagesFromLocalStorage = (): ChatMessage[] => {
+      const saved = localStorage.getItem(localStorageKey);
+      return saved ? JSON.parse(saved) : [];
+    };
+
+    // Only call the function once the component is mounted
+    setData(getMessagesFromLocalStorage());
+  }, []);
 
   useEffect(() => {
     setAvatars({
