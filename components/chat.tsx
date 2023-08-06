@@ -184,8 +184,14 @@ export function Chat() {
   return (
     <Card className="w-full mx-auto">
       <CardHeader>
-        <CardTitle>Welcome</CardTitle>
-        <span className="font-base text-md">{activeUser.firstName}</span>
+        <div>
+          <CardTitle>Welcome</CardTitle>
+          <span className="font-base text-md">{activeUser.firstName}</span>
+        </div>
+        <div className="text-gray-500 text-sm">
+          Type and send messages. To test two-way conversations, switch to a
+          different user and continue chatting.
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSendMessage}>
