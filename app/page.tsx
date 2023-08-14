@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Chat } from "@/components/chat";
+import Chat from "@/components/chat";
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 import { useUser } from "@/lib/UserContext";
+import ChatRV from "@/components/_archive/chat-reverse-scroll";
 
 export default function Home() {
   return (
@@ -17,6 +18,9 @@ export default function Home() {
           </h1>
         </div>
       </div>
+      {/* <div className="w-[350px] sm:w-[500px]">
+        <ChatRV />
+      </div> */}
       <div className="w-[350px] sm:w-[500px]">
         <Chat />
       </div>
